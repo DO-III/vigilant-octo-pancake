@@ -2,6 +2,7 @@ const ASSET_MANAGER = new AssetManager();
 ASSET_MANAGER.queueDownload("./overlay.png");
 ASSET_MANAGER.queueDownload("./cave.png");
 ASSET_MANAGER.queueDownload("./spelunky.png");
+ASSET_MANAGER.queueDownload("./spelunkyf.png");
 const gameEngine = new GameEngine();
 
 

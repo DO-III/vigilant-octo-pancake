@@ -23,15 +23,6 @@ class Animator {
             frame = this.frameCount - frame - 1;
         }
 
-        /*
-        if(this.mirror) {
-            ctx.save();
-            ctx.scale(-1, 1);
-            x *= -1;
-            x -= 80
-        }
-        */
-
 
         ctx.drawImage(this.spritesheet, 
              (this.xStart + this.width*frame), this.yStart,
