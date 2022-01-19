@@ -16,7 +16,6 @@ ASSET_MANAGER.downloadAll(() => {
 	gameEngine.init(ctx);
 
 	gameEngine.addEntity(new Spelunker(gameEngine));
-//	gameEngine.addEntity(new Overlay(gameEngine));
 	
 
 	gameEngine.start();
