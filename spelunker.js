@@ -8,7 +8,7 @@ class Spelunker{
         this.FImageAsset = ASSET_MANAGER.getAsset("./spelunkyf.png");
         this.x = 250; //Guy's Starting x position
         this.y = 250; //Guy's y position.
-        this.isIdling = true; //Is Guy idling?
+        this.isForced = false; //Has Guy been forced to idle?
 
         //Movements states for Guy.
         //0 - Idle state
@@ -16,7 +16,6 @@ class Spelunker{
         //2 - Crouch
         //3 - Crawl
         //4 - Dash
-        //5 - Looking Up
         this.state;
         //Direction Facing.
         //0 - right, 1 - left
@@ -27,7 +26,7 @@ class Spelunker{
         this.stateSpeeds = new Array (0, 100, 0, 50, 250, 0);
         //Time to wait for next action.
         this.timeConsumed = 0;
-        this.timeToReach = 5;
+        this.timeToReach = 1;
 
         //Guy Spelunky's animations are stored here.
         this.animations = [];
@@ -45,9 +44,17 @@ class Spelunker{
         //Guy Spelunky picks random animations; he might walk, crawl, or run.
         //He idles for anywhere between half a second to two seconds between anims.
         //And he'll animate for a quarter second to one second at a time.
-        this.state = this.getRandomInt(0, 5);
-        this.facing = this.getRandomInt(0, 2);
+        if (!this.isForced) {
+            this.state = this.getRandomInt(0, 5);
+            this.facing = this.getRandomInt(0, 2);
+        } else {
+            //if Guy was crawling, revert to crouch.
+            //otherwise revert to idle.
+            this.state = (this.state == 3 ? 2 : 0);
+            this.isForced = false;
+        }
         this.speed = this.stateSpeeds[this.state];
+        
         
         if(this.facing == 1) {
             this.speed *= -1;
@@ -73,11 +80,16 @@ class Spelunker{
     //won't walk off the face of the Earth.
     update() {
         this.checkMyAnimation();
-        this.x += this.speed * this.game.clockTick;
-        if(this.x < 80 && this.facing == 1) {
-            this.x = 420;
-        } else if (this.x > 420 && this.facing == 0) {
-            this.x = 80;
+        if(this.x < 135 && this.facing == 1) {
+            this.x += 1;
+            this.forceAnimation();
+            //this.x = 360;
+        } else if (this.x > 365 && this.facing == 0) {
+            this.x -= 1;
+            this.forceAnimation();
+            //this.x = 130;
+        } else {
+            this.x += this.speed * this.game.clockTick;
         }
     };
 
@@ -87,9 +99,19 @@ class Spelunker{
         this.timeConsumed += this.game.clockTick;
         if(this.timeConsumed >= this.timeToReach) {
             this.timeConsumed = 0;
-            this.timeToReach = this.getRandomInt(2, 6);
+            this.timeToReach = this.getRandomInt(1, 3);
             this.animateMe();
         }
+    }
+
+    //Force the animation to change.
+    //This only occurs when Guy reaches a wall.
+    //When this occurs, raise a flag that locks Guy's animation to
+    //standing.
+    forceAnimation() {
+        this.state = 0;
+        this.timeConsumed = 999;
+        this.isForced = true;
     }
 
 
@@ -125,15 +147,15 @@ class Spelunker{
 
         //0 - Idle State; Left, Right
         this.animations[0][0] = new Animator(iA, 0, 0, X_DIM, Y_DIM, 1, 1, false, true, true);
-        this.animations[0][1] = new Animator(fiA, X_DIM * 12, 0, X_DIM, Y_DIM, 1, 1, true, true, false);
+        this.animations[0][1] = new Animator(fiA, (X_DIM * 12) - 20, 0, X_DIM, Y_DIM, 1, 1, true, true, false);
 
         //1 - Walking State
         this.animations[1][0] = new Animator(iA, 0, 0, X_DIM, Y_DIM, 9, 0.05, false, true, true);
-        this.animations[1][1] = new Animator(fiA, (X_DIM * 4) - 2, 0, X_DIM, Y_DIM, 9, 0.05, true, true, false);
+        this.animations[1][1] = new Animator(fiA, (X_DIM * 4) - 20, 0, X_DIM, Y_DIM, 9, 0.05, true, true, false);
 
         //2 - Crouch State
         this.animations[2][0] = new Animator(iA, (X_DIM * 2), Y_DIM, X_DIM, Y_DIM, 1, 1, false, true, true);
-        this.animations[2][1] = new Animator(fiA, (X_DIM * 10), Y_DIM, X_DIM, Y_DIM, 1, 1, true, true, false);
+        this.animations[2][1] = new Animator(fiA, (X_DIM * 10) - 10, Y_DIM, X_DIM, Y_DIM, 1, 1, true, true, false);
 
         //3 - Crawling State
         this.animations[3][0] = new Animator(iA, (X_DIM * 5), (Y_DIM * 1), X_DIM, Y_DIM, 7, 0.10, false, true, true);
@@ -141,7 +163,7 @@ class Spelunker{
 
         //4 - Dashing State
         this.animations[4][0] = new Animator(iA, (X_DIM * 6), (Y_DIM * 6), X_DIM, Y_DIM, 6, 0.05, false, true, true);
-        this.animations[4][1] = new Animator(fiA, (X_DIM * 1) - 5, (Y_DIM * 6), X_DIM, Y_DIM, 6, 0.05, true, true, false);
+        this.animations[4][1] = new Animator(fiA, (X_DIM * 1) - 6, (Y_DIM * 6), X_DIM, Y_DIM, 6, 0.05, true, true, false);
 
 
     };
